@@ -1,0 +1,17 @@
+{
+  "name": "ecommerce-hobby-mern",
+  "version": "1.0.0",
+  "description": "MERN Stack E-commerce platform for hobby figures & tabletop games (Anime figures, Warhammer 40k/AoE, Boardgames)",
+  "scripts": {
+    "start": "npm --prefix server start",
+    "server": "npm --prefix server start",
+    "server:dev": "npm --prefix server run dev",
+    "client": "npm --prefix client dev",
+    "client:build": "npm --prefix client build",
+    "seed": "npm --prefix server run seed",
+    "install-all": "npm --prefix server install && npm --prefix client install"
+  },
+  "keywords": ["mern", "ecommerce", "anime-figures", "warhammer", "boardgames"],
+  "author": "Antigravity Engineering",
+  "license": "ISC"
+}
