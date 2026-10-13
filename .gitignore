@@ -38,6 +38,11 @@ build/
 !.vscode/extensions.json
 .idea
 .DS_Store
+
+# Uploaded user media
+server/uploads/*
+!server/uploads/.gitkeep
+
 *.suo
 *.ntvs*
 *.njsproj

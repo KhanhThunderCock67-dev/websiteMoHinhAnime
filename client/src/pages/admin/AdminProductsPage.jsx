@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Plus, Edit2, Trash2, Search, Filter, AlertTriangle, Check, Layers } from 'lucide-react';
 import Modal from '../../components/Modal';
 import Badge from '../../components/Badge';
+import ImageUpload from '../../components/ImageUpload';
 import { productApi, categoryApi } from '../../api';
+import { useTranslation } from '../../store/localeStore';
+import { useCurrencyStore } from '../../store/currencyStore';
 
 export const AdminProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -10,6 +13,8 @@ export const AdminProductsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const { t } = useTranslation();
+  const { formatPrice } = useCurrencyStore();
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,6 +26,7 @@ export const AdminProductsPage = () => {
   function getInitialFormState() {
     return {
       name: '',
+
       brand: '',
       sku: '',
       category: '',
@@ -140,6 +146,15 @@ export const AdminProductsPage = () => {
       return;
     }
 
+    const validImages = (formData.images || []).filter(
+      (img) => typeof img === 'string' && img.trim() !== ''
+    );
+
+    if (validImages.length === 0) {
+      setModalError('Please upload or provide a product image');
+      return;
+    }
+
     setIsSaving(true);
 
     try {
@@ -148,8 +163,9 @@ export const AdminProductsPage = () => {
         price,
         discountPrice,
         stockCount: Number(formData.stockCount),
-        images: formData.images.filter((img) => img.trim() !== ''),
+        images: validImages,
       };
+
 
       if (editingProductId) {
         await productApi.update(editingProductId, payload);
@@ -171,15 +187,15 @@ export const AdminProductsPage = () => {
       {/* Top action header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white font-['Outfit']">Product Inventory Control</h1>
-          <p className="text-xs text-slate-400 mt-0.5">Manage stock allocation, pricing, and domain attributes</p>
+          <h1 className="text-2xl font-extrabold text-white font-display">{t('adminProducts.title', null, 'Product Inventory Control')}</h1>
+          <p className="text-xs text-slate-400 mt-0.5">{t('adminProducts.subtitle', null, 'Manage stock allocation, pricing, and domain attributes')}</p>
         </div>
 
         <button
           onClick={handleOpenCreateModal}
           className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-lg shadow-amber-500/20 flex items-center gap-2 transition-all"
         >
-          <Plus className="w-4 h-4" /> Add Hobby Product
+          <Plus className="w-4 h-4" /> {t('adminProducts.addProduct', null, 'Add Hobby Product')}
         </button>
       </div>
 
@@ -188,7 +204,7 @@ export const AdminProductsPage = () => {
         <form onSubmit={handleSearch} className="flex items-center gap-2 flex-1 max-w-sm">
           <input
             type="text"
-            placeholder="Filter by name, SKU, or brand..."
+            placeholder={t('adminProducts.searchPlaceholder', null, 'Filter by name, SKU, or brand...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
@@ -207,7 +223,7 @@ export const AdminProductsPage = () => {
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-amber-500"
           >
-            <option value="">All Categories</option>
+            <option value="">{t('adminProducts.allCategories', null, 'All Categories')}</option>
             {categories.map((c) => (
               <option key={c._id} value={c.slug}>
                 {c.name}
@@ -223,15 +239,16 @@ export const AdminProductsPage = () => {
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950/80 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
               <tr>
-                <th className="p-4">Item & SKU</th>
-                <th className="p-4">Discipline / Brand</th>
-                <th className="p-4">Attributes</th>
-                <th className="p-4">Price</th>
-                <th className="p-4">Stock Level</th>
-                <th className="p-4 text-right">Actions</th>
+                <th className="p-4">{t('adminProducts.productName', null, 'Item & SKU')}</th>
+                <th className="p-4">{t('adminProducts.brand', null, 'Discipline / Brand')}</th>
+                <th className="p-4">{t('product.specifications', null, 'Attributes')}</th>
+                <th className="p-4">{t('adminProducts.price', null, 'Price')}</th>
+                <th className="p-4">{t('adminProducts.stock', null, 'Stock Level')}</th>
+                <th className="p-4 text-right">{t('adminProducts.actions', null, 'Actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/80">
+
               {isLoading ? (
                 <tr>
                   <td colSpan="6" className="p-8 text-center text-slate-500">
@@ -283,12 +300,12 @@ export const AdminProductsPage = () => {
                         </div>
                       </td>
                       <td className="p-4">
-                        <p className="font-bold text-white font-['Outfit'] text-sm">
-                          ${(p.discountPrice > 0 ? p.discountPrice : p.price).toFixed(2)}
+                        <p className="font-bold text-white font-display text-sm">
+                          {formatPrice(p.discountPrice > 0 ? p.discountPrice : p.price)}
                         </p>
                         {p.discountPrice > 0 && (
                           <span className="text-[10px] text-slate-500 line-through">
-                            ${p.price.toFixed(2)}
+                            {formatPrice(p.price)}
                           </span>
                         )}
                       </td>
@@ -302,7 +319,7 @@ export const AdminProductsPage = () => {
                               : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300'
                           }`}
                         >
-                          {isOut ? 'Out of Stock' : `${p.stockCount} units`}
+                          {isOut ? t('adminProducts.outOfStock', null, 'Out of Stock') : `${p.stockCount} units`}
                         </span>
                       </td>
                       <td className="p-4 text-right">
@@ -310,14 +327,14 @@ export const AdminProductsPage = () => {
                           <button
                             onClick={() => handleOpenEditModal(p)}
                             className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
-                            title="Edit Product"
+                            title={t('adminProducts.edit', null, 'Edit Product')}
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleDeleteProduct(p._id, p.name)}
                             className="p-2 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors"
-                            title="Delete Product"
+                            title={t('adminProducts.delete', null, 'Delete Product')}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -331,6 +348,7 @@ export const AdminProductsPage = () => {
           </table>
         </div>
       </div>
+
 
       {/* Create / Edit Product Modal */}
       <Modal
@@ -527,17 +545,18 @@ export const AdminProductsPage = () => {
 
           {/* Section 4: Image & Description */}
           <div className="space-y-4 pt-4 border-t border-slate-800">
-            <div>
-              <label className="block text-slate-400 font-semibold mb-1">Image URL *</label>
-              <input
-                type="url"
-                required
-                value={formData.images[0] || ''}
-                onChange={(e) => setFormData({ ...formData, images: [e.target.value] })}
-                placeholder="https://images.unsplash.com/..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500"
-              />
-            </div>
+            <ImageUpload
+              label="Product Image *"
+              value={formData.images[0] || ''}
+              onChange={(newUrl) =>
+                setFormData({
+                  ...formData,
+                  images: newUrl ? [newUrl] : [''],
+                })
+              }
+              required
+            />
+
 
             <div>
               <label className="block text-slate-400 font-semibold mb-1">Product Description *</label>

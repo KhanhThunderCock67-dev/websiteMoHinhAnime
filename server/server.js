@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const path = require('path');
 const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
 
@@ -12,6 +13,11 @@ const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
+const settingRoutes = require('./routes/settingRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+
+
 
 const app = express();
 
@@ -58,6 +64,9 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Static files for uploaded images
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -65,6 +74,11 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/settings', settingRoutes);
+app.use('/api/reviews', reviewRoutes);
+
+
 
 // Error Handling Middlewares
 app.use(notFound);
@@ -82,4 +96,5 @@ process.on('unhandledRejection', (err) => {
   // server.close(() => process.exit(1));
 });
 
+app.server = server;
 module.exports = app;

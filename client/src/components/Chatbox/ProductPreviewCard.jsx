@@ -3,10 +3,14 @@ import { Link } from 'react-router-dom';
 import { ExternalLink, ShoppingBag, Check } from 'lucide-react';
 import { useCartStore } from '../../store/cartStore';
 import { useAuthStore } from '../../store/authStore';
+import { useTranslation } from '../../store/localeStore';
+import { useCurrencyStore } from '../../store/currencyStore';
 
 export const ProductPreviewCard = ({ product }) => {
   const { addToCart } = useCartStore();
   const { isAuthenticated } = useAuthStore();
+  const { t } = useTranslation();
+  const { formatPrice } = useCurrencyStore();
   const [added, setAdded] = React.useState(false);
 
   const price = product.price;
@@ -55,13 +59,13 @@ export const ProductPreviewCard = ({ product }) => {
 
         <div>
           <div className="flex items-baseline justify-between mb-2">
-            <span className="text-sm font-bold font-['Outfit'] text-amber-400">
-              ${price?.toFixed(2)}
+            <span className="text-sm font-bold font-display text-amber-400">
+              {formatPrice(price)}
             </span>
             {isOutOfStock ? (
-              <span className="text-[10px] text-rose-400 font-medium">Hết hàng</span>
+              <span className="text-[10px] text-rose-400 font-medium">{t('product.soldOut', null, 'Sold Out')}</span>
             ) : (
-              <span className="text-[10px] text-emerald-400 font-medium">Còn {product.stockCount}</span>
+              <span className="text-[10px] text-emerald-400 font-medium">{product.stockCount} left</span>
             )}
           </div>
 
@@ -70,7 +74,7 @@ export const ProductPreviewCard = ({ product }) => {
               to={`/product/${product.slug || product.id}`}
               className="flex-1 py-1 px-2 rounded-lg bg-vault-800 hover:bg-vault-700 text-slate-200 text-[11px] font-medium text-center transition-colors flex items-center justify-center gap-1"
             >
-              <span>Xem</span>
+              <span>{t('adminOrders.viewDetails', null, 'View')}</span>
               <ExternalLink className="w-3 h-3 text-slate-400" />
             </Link>
 
@@ -82,7 +86,7 @@ export const ProductPreviewCard = ({ product }) => {
                   ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
                   : 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20 disabled:opacity-40 disabled:cursor-not-allowed'
               }`}
-              title="Thêm vào giỏ"
+              title={t('product.addToCart', null, 'Add to Cart')}
             >
               {added ? <Check className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}
             </button>
@@ -94,3 +98,4 @@ export const ProductPreviewCard = ({ product }) => {
 };
 
 export default ProductPreviewCard;
+

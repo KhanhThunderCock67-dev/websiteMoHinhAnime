@@ -5,10 +5,12 @@ import ProductCard from '../components/ProductCard';
 import FilterSidebar from '../components/FilterSidebar';
 import { productApi } from '../api';
 import { useFilterStore } from '../store/filterStore';
+import { useTranslation } from '../store/localeStore';
 
 export const CatalogPage = () => {
   const [searchParams] = useSearchParams();
   const { filters, setFilter, setCategory, setPage, resetFilters } = useFilterStore();
+  const { t } = useTranslation();
 
   const [products, setProducts] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1, totalItems: 0 });
@@ -43,6 +45,7 @@ export const CatalogPage = () => {
           maxPrice: filters.maxPrice || undefined,
           inStock: filters.inStock ? true : undefined,
           isPreOrder: filters.isPreOrder !== '' ? filters.isPreOrder : undefined,
+          minRating: filters.minRating || undefined,
           keyword: filters.keyword || undefined,
           sort: filters.sort,
           page: filters.page,
@@ -65,30 +68,31 @@ export const CatalogPage = () => {
   }, [filters]);
 
   const activeFilters = [];
-  if (filters.category) activeFilters.push({ key: 'category', label: `Category: ${filters.category}`, clear: () => setCategory('') });
-  if (filters.faction) activeFilters.push({ key: 'faction', label: `Faction: ${filters.faction}`, clear: () => setFilter('faction', '') });
-  if (filters.scale) activeFilters.push({ key: 'scale', label: `Scale: ${filters.scale}`, clear: () => setFilter('scale', '') });
-  if (filters.complexity) activeFilters.push({ key: 'complexity', label: `Complexity: ${filters.complexity}`, clear: () => setFilter('complexity', '') });
-  if (filters.players) activeFilters.push({ key: 'players', label: `${filters.players} Players`, clear: () => setFilter('players', '') });
-  if (filters.inStock) activeFilters.push({ key: 'inStock', label: 'In Stock Only', clear: () => setFilter('inStock', false) });
-  if (filters.isPreOrder) activeFilters.push({ key: 'isPreOrder', label: 'Pre-Orders Only', clear: () => setFilter('isPreOrder', '') });
-  if (filters.keyword) activeFilters.push({ key: 'keyword', label: `Search: "${filters.keyword}"`, clear: () => setFilter('keyword', '') });
+  if (filters.category) activeFilters.push({ key: 'category', label: `${t('product.category', null, 'Category')}: ${filters.category}`, clear: () => setCategory('') });
+  if (filters.faction) activeFilters.push({ key: 'faction', label: `${t('product.faction', null, 'Faction')}: ${filters.faction}`, clear: () => setFilter('faction', '') });
+  if (filters.scale) activeFilters.push({ key: 'scale', label: `${t('product.scale', null, 'Scale')}: ${filters.scale}`, clear: () => setFilter('scale', '') });
+  if (filters.complexity) activeFilters.push({ key: 'complexity', label: `${t('product.complexity', null, 'Complexity')}: ${filters.complexity}`, clear: () => setFilter('complexity', '') });
+  if (filters.players) activeFilters.push({ key: 'players', label: `${filters.players} ${t('product.players', null, 'Players')}`, clear: () => setFilter('players', '') });
+  if (filters.inStock) activeFilters.push({ key: 'inStock', label: t('filters.inStockOnly', null, 'In Stock Only'), clear: () => setFilter('inStock', false) });
+  if (filters.isPreOrder) activeFilters.push({ key: 'isPreOrder', label: t('filters.preOrderOnly', null, 'Pre-Orders Only'), clear: () => setFilter('isPreOrder', '') });
+  if (filters.keyword) activeFilters.push({ key: 'keyword', label: `${t('common.search', null, 'Search')}: "${filters.keyword}"`, clear: () => setFilter('keyword', '') });
+
+  const getPageTitle = () => {
+    if (filters.category === 'anime-figures') return t('nav.animeFigures', null, 'Anime Scale Figures & Nendoroids');
+    if (filters.category === 'warhammer-40k') return t('nav.warhammer40k', null, 'Warhammer 40,000 Armory');
+    if (filters.category === 'board-games') return t('nav.boardGames', null, 'Tabletop Strategy & Board Games');
+    return t('catalog.title', null, 'Collector Catalog');
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Page Title & Breadcrumb */}
       <div className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-['Outfit']">
-          {filters.category === 'anime-figures'
-            ? 'Anime Scale Figures & Nendoroids'
-            : filters.category === 'warhammer-40k'
-            ? 'Warhammer 40,000 Armory'
-            : filters.category === 'board-games'
-            ? 'Tabletop Strategy & Board Games'
-            : 'Hobby & Tabletop Catalog'}
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
+          {getPageTitle()}
         </h1>
         <p className="text-sm text-slate-400 mt-1">
-          Showing {pagination.totalItems} verified collector items
+          {t('catalog.showingResults', { count: pagination.totalItems }, `Showing ${pagination.totalItems} collector items`)}
         </p>
       </div>
 
@@ -109,7 +113,7 @@ export const CatalogPage = () => {
               {activeFilters.length > 0 ? (
                 <>
                   <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">
-                    Active:
+                    {t('catalog.activeFilters', null, 'Active Filters:')}
                   </span>
                   {activeFilters.map((af) => (
                     <span
@@ -129,11 +133,11 @@ export const CatalogPage = () => {
                     onClick={resetFilters}
                     className="text-xs text-slate-400 hover:text-white underline ml-1"
                   >
-                    Clear All
+                    {t('catalog.clearAll', null, 'Clear All')}
                   </button>
                 </>
               ) : (
-                <span className="text-xs text-slate-400">All filters default</span>
+                <span className="text-xs text-slate-400">{t('catalog.subtitle', null, 'Browse authentic anime scale figures, Warhammer sets, and board games.')}</span>
               )}
             </div>
 
@@ -141,7 +145,7 @@ export const CatalogPage = () => {
             <div className="flex items-center gap-2.5 ml-auto">
               <ArrowUpDown className="w-4 h-4 text-slate-400" />
               <label htmlFor="sort-select" className="text-xs text-slate-400 font-semibold">
-                Sort:
+                {t('catalog.sortBy', null, 'Sort:')}
               </label>
               <select
                 id="sort-select"
@@ -149,11 +153,11 @@ export const CatalogPage = () => {
                 onChange={(e) => setFilter('sort', e.target.value)}
                 className="bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-medium text-slate-200 focus:outline-none focus:border-amber-500 cursor-pointer"
               >
-                <option value="newest">Newest Releases</option>
-                <option value="best-selling">Best Selling</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="rating">Highest Rated</option>
+                <option value="newest">{t('catalog.sortNewest', null, 'Newest Arrivals')}</option>
+                <option value="best-selling">{t('catalog.sortRating', null, 'Best Selling')}</option>
+                <option value="price-asc">{t('catalog.sortPriceAsc', null, 'Price: Low to High')}</option>
+                <option value="price-desc">{t('catalog.sortPriceDesc', null, 'Price: High to Low')}</option>
+                <option value="rating">{t('catalog.sortRating', null, 'Highest Rated')}</option>
               </select>
             </div>
           </div>
@@ -173,15 +177,15 @@ export const CatalogPage = () => {
               <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center text-slate-500 mx-auto">
                 <PackageOpen className="w-8 h-8" />
               </div>
-              <h3 className="text-lg font-bold text-white">No products found</h3>
+              <h3 className="text-lg font-bold text-white">{t('catalog.noProductsTitle', null, 'No products found')}</h3>
               <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                No collector items match your current combination of filters. Try broadening your criteria or resetting filters.
+                {t('catalog.noProductsDesc', null, 'No collector items match your current combination of filters. Try broadening your criteria or resetting filters.')}
               </p>
               <button
                 onClick={resetFilters}
                 className="px-5 py-2.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold shadow-md hover:bg-amber-400 transition-all"
               >
-                Reset All Filters
+                {t('catalog.resetFiltersBtn', null, 'Reset All Filters')}
               </button>
             </div>
           ) : (
@@ -233,3 +237,4 @@ export const CatalogPage = () => {
 };
 
 export default CatalogPage;
+

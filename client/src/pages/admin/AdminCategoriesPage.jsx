@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Plus, Trash2, FolderTree, Tag } from 'lucide-react';
 import Modal from '../../components/Modal';
 import { categoryApi } from '../../api';
+import { useTranslation } from '../../store/localeStore';
 
 export const AdminCategoriesPage = () => {
   const [categories, setCategories] = useState([]);
@@ -12,6 +13,7 @@ export const AdminCategoriesPage = () => {
   const [newCatDescription, setNewCatDescription] = useState('');
   const [newSubCategories, setNewSubCategories] = useState('');
   const [errorMsg, setErrorMsg] = useState(null);
+  const { t } = useTranslation();
 
   const loadCategories = async () => {
     setIsLoading(true);
@@ -71,15 +73,15 @@ export const AdminCategoriesPage = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-white font-['Outfit']">Category Taxonomies</h1>
-          <p className="text-xs text-slate-400 mt-0.5">Configure main hobby departments and subcategories</p>
+          <h1 className="text-2xl font-extrabold text-white font-display">{t('adminCategories.title', null, 'Category Taxonomies')}</h1>
+          <p className="text-xs text-slate-400 mt-0.5">{t('adminCategories.subtitle', null, 'Configure main hobby departments and subcategories')}</p>
         </div>
 
         <button
           onClick={() => setIsModalOpen(true)}
           className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 flex items-center gap-2"
         >
-          <Plus className="w-4 h-4" /> Add Category
+          <Plus className="w-4 h-4" /> {t('adminCategories.addCategory', null, 'Add Category')}
         </button>
       </div>
 
@@ -101,13 +103,13 @@ export const AdminCategoriesPage = () => {
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
-              <h3 className="text-lg font-bold text-white font-['Outfit']">{cat.name}</h3>
+              <h3 className="text-lg font-bold text-white font-display">{cat.name}</h3>
               <p className="text-xs text-slate-400 line-clamp-2">{cat.description}</p>
             </div>
 
             <div className="space-y-2 pt-2 border-t border-slate-800">
               <span className="text-[10px] uppercase tracking-wider font-bold text-slate-500 block">
-                Subcategories ({cat.subCategories?.length || 0})
+                {t('filters.subCategories', null, 'Subcategories')} ({cat.subCategories?.length || 0})
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {cat.subCategories?.map((sub, idx) => (
@@ -128,7 +130,7 @@ export const AdminCategoriesPage = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Add Category Discipline"
+        title={t('adminCategories.addCategory', null, 'Add Category Discipline')}
       >
         {errorMsg && (
           <div className="mb-4 p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs">
@@ -138,7 +140,7 @@ export const AdminCategoriesPage = () => {
 
         <form onSubmit={handleCreateCategory} className="space-y-4 text-xs">
           <div>
-            <label className="block text-slate-400 font-semibold mb-1">Category Name *</label>
+            <label className="block text-slate-400 font-semibold mb-1">{t('adminCategories.categoryName', null, 'Category Name *')}</label>
             <input
               type="text"
               required
@@ -150,7 +152,7 @@ export const AdminCategoriesPage = () => {
           </div>
 
           <div>
-            <label className="block text-slate-400 font-semibold mb-1">Slug</label>
+            <label className="block text-slate-400 font-semibold mb-1">{t('adminCategories.slug', null, 'Slug')}</label>
             <input
               type="text"
               value={newCatSlug}
@@ -161,7 +163,7 @@ export const AdminCategoriesPage = () => {
           </div>
 
           <div>
-            <label className="block text-slate-400 font-semibold mb-1">Description</label>
+            <label className="block text-slate-400 font-semibold mb-1">{t('adminCategories.description', null, 'Description')}</label>
             <textarea
               rows="2"
               value={newCatDescription}
@@ -172,7 +174,7 @@ export const AdminCategoriesPage = () => {
 
           <div>
             <label className="block text-slate-400 font-semibold mb-1">
-              Subcategories (comma separated)
+              {t('adminCategories.subCategories', null, 'Subcategories (comma separated)')}
             </label>
             <input
               type="text"
@@ -189,13 +191,13 @@ export const AdminCategoriesPage = () => {
               onClick={() => setIsModalOpen(false)}
               className="px-4 py-2 rounded-xl text-slate-400 hover:text-white"
             >
-              Cancel
+              {t('adminCategories.cancel', null, 'Cancel')}
             </button>
             <button
               type="submit"
               className="px-6 py-2 rounded-xl bg-amber-500 text-slate-950 font-bold"
             >
-              Create Category
+              {t('adminCategories.create', null, 'Create Category')}
             </button>
           </div>
         </form>
@@ -205,3 +207,4 @@ export const AdminCategoriesPage = () => {
 };
 
 export default AdminCategoriesPage;
+

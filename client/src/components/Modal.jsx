@@ -28,7 +28,7 @@ export const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-2xl'
         className={`relative w-full ${maxWidth} rounded-3xl bg-vault-900 border border-slate-700 shadow-2xl overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-200`}
       >
         <div className="px-6 py-5 border-b border-slate-800 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-white font-['Outfit']">{title}</h3>
+          <h3 className="text-lg font-bold text-white font-display">{title}</h3>
           <button
             onClick={onClose}
             className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"

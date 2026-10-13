@@ -3,12 +3,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, ShieldCheck } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
+import { useTranslation } from '../store/localeStore';
+import { useCurrencyStore } from '../store/currencyStore';
 
 export const CartPage = () => {
   const navigate = useNavigate();
   const { items, updateQuantity, removeItem, clearCart, getTotalPrice, getTotalCount } =
     useCartStore();
   const { isAuthenticated } = useAuthStore();
+  const { t } = useTranslation();
+  const { formatPrice } = useCurrencyStore();
 
   const totalPrice = getTotalPrice();
   const totalCount = getTotalCount();
@@ -21,15 +25,17 @@ export const CartPage = () => {
         <div className="w-20 h-20 rounded-3xl bg-vault-900 border border-slate-800 flex items-center justify-center text-slate-600 mx-auto">
           <ShoppingBag className="w-10 h-10" />
         </div>
-        <h2 className="text-2xl font-bold text-white font-['Outfit']">Your Cart is Currently Empty</h2>
+        <h2 className="text-2xl font-bold text-white font-display">
+          {t('cart.emptyTitle', null, 'Your Cart is Currently Empty')}
+        </h2>
         <p className="text-sm text-slate-400 max-w-sm mx-auto">
-          Discover our curated collection of scale figures, miniatures, and board games.
+          {t('cart.emptyDesc', null, 'Discover our curated collection of scale figures, miniatures, and board games.')}
         </p>
         <Link
           to="/catalog"
           className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-xl shadow-amber-500/20 transition-all"
         >
-          Browse Catalog
+          {t('catalog.title', null, 'Browse Catalog')}
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
@@ -40,14 +46,14 @@ export const CartPage = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       <div className="flex items-center justify-between border-b border-slate-800 pb-5">
         <div>
-          <h1 className="text-3xl font-extrabold text-white font-['Outfit']">Shopping Cart</h1>
-          <p className="text-xs text-slate-400 mt-1">{totalCount} collector items reserved</p>
+          <h1 className="text-3xl font-extrabold text-white font-display">{t('cart.title', null, 'Shopping Cart')}</h1>
+          <p className="text-xs text-slate-400 mt-1">{totalCount} {t('home.itemsCount', { count: totalCount }, 'collector items reserved')}</p>
         </div>
         <button
           onClick={() => clearCart(isAuthenticated)}
           className="text-xs text-rose-400 hover:text-rose-300 transition-colors"
         >
-          Clear Cart
+          {t('cart.clearCart', null, 'Clear Cart')}
         </button>
       </div>
 
@@ -105,12 +111,12 @@ export const CartPage = () => {
                     </button>
                   </div>
 
-                  <div className="text-right min-w-[90px]">
-                    <p className="text-base font-extrabold text-white font-['Outfit']">
-                      ${(effectivePrice * item.quantity).toFixed(2)}
+                  <div className="text-right min-w-[100px]">
+                    <p className="text-base font-extrabold text-white font-display">
+                      {formatPrice(effectivePrice * item.quantity)}
                     </p>
                     <p className="text-[11px] text-slate-400">
-                      ${effectivePrice.toFixed(2)} ea
+                      {formatPrice(effectivePrice)} ea
                     </p>
                   </div>
 
@@ -129,29 +135,29 @@ export const CartPage = () => {
         {/* Order Summary Checkout Card */}
         <div className="space-y-6">
           <div className="p-6 rounded-3xl bg-vault-900 border border-slate-800 space-y-4">
-            <h2 className="text-lg font-bold text-white font-['Outfit']">Order Summary</h2>
+            <h2 className="text-lg font-bold text-white font-display">{t('checkout.orderSummary', { count: totalCount }, 'Order Summary')}</h2>
 
             <div className="space-y-2.5 text-xs text-slate-300 divide-y divide-slate-800/80">
               <div className="flex justify-between pt-1">
-                <span>Items Subtotal</span>
-                <span className="font-bold text-white font-['Outfit'] text-sm">
-                  ${totalPrice.toFixed(2)}
+                <span>{t('cart.subtotal', null, 'Items Subtotal')}</span>
+                <span className="font-bold text-white font-display text-sm">
+                  {formatPrice(totalPrice)}
                 </span>
               </div>
               <div className="flex justify-between pt-2">
-                <span>Insured Collector Shipping</span>
+                <span>{t('cart.shipping', null, 'Insured Collector Shipping')}</span>
                 <span className={shippingFee === 0 ? 'text-emerald-400 font-bold' : 'font-bold text-white'}>
-                  {shippingFee === 0 ? 'FREE' : `$${shippingFee.toFixed(2)}`}
+                  {shippingFee === 0 ? t('cart.freeShipping', null, 'FREE') : formatPrice(shippingFee)}
                 </span>
               </div>
               <div className="flex justify-between pt-2">
-                <span>Estimated Sales Tax</span>
-                <span className="text-slate-400 font-medium">Calculated at checkout</span>
+                <span>{t('cart.tax', null, 'Estimated Sales Tax')}</span>
+                <span className="text-slate-400 font-medium">{t('checkout.calculatedAtCheckout', null, 'Calculated at checkout')}</span>
               </div>
               <div className="flex justify-between pt-3 text-base font-extrabold text-white">
-                <span>Estimated Total</span>
-                <span className="text-xl text-amber-400 font-['Outfit']">
-                  ${grandTotal.toFixed(2)}
+                <span>{t('cart.grandTotal', null, 'Estimated Total')}</span>
+                <span className="text-xl text-amber-400 font-display">
+                  {formatPrice(grandTotal)}
                 </span>
               </div>
             </div>
@@ -160,14 +166,14 @@ export const CartPage = () => {
               onClick={() => navigate('/checkout')}
               className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-sm shadow-xl shadow-amber-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
             >
-              Proceed to Checkout
+              {t('cart.proceedCheckout', null, 'Proceed to Checkout')}
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
           <div className="p-4 rounded-2xl bg-vault-900/40 border border-slate-800 flex items-center gap-3 text-xs text-slate-400">
             <ShieldCheck className="w-5 h-5 text-amber-400 shrink-0" />
-            <span>Bank-grade 256-bit encrypted checkout with verified stock allocation.</span>
+            <span>{t('checkout.encryptedBadge', null, 'Bank-grade 256-bit encrypted checkout with verified stock allocation.')}</span>
           </div>
         </div>
       </div>
@@ -176,3 +182,4 @@ export const CartPage = () => {
 };
 
 export default CartPage;
+

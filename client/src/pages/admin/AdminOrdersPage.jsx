@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Eye, Truck, CheckCircle2, Clock, XCircle, AlertCircle } from 'lucide-react';
-import Badge from '../../components/Badge';
+import { Eye } from 'lucide-react';
 import Modal from '../../components/Modal';
 import { orderApi } from '../../api';
+import { useTranslation } from '../../store/localeStore';
+import { useCurrencyStore } from '../../store/currencyStore';
 
 export const AdminOrdersPage = () => {
   const [orders, setOrders] = useState([]);
@@ -11,6 +12,8 @@ export const AdminOrdersPage = () => {
   const [activeOrder, setActiveOrder] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState(null);
+  const { t } = useTranslation();
+  const { formatPrice } = useCurrencyStore();
 
   const loadOrders = async () => {
     setIsLoading(true);
@@ -55,8 +58,8 @@ export const AdminOrdersPage = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white font-['Outfit']">Order Pipeline & Fulfillment</h1>
-          <p className="text-xs text-slate-400 mt-0.5">Manage tracking stages from confirmation through dispatch</p>
+          <h1 className="text-2xl font-extrabold text-white font-display">{t('adminOrders.title', null, 'Order Pipeline & Fulfillment')}</h1>
+          <p className="text-xs text-slate-400 mt-0.5">{t('adminOrders.subtitle', null, 'Manage tracking stages from confirmation through dispatch')}</p>
         </div>
 
         {/* Filter status pills */}
@@ -71,7 +74,7 @@ export const AdminOrdersPage = () => {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              {st || 'All Orders'}
+              {st ? t(`userOrders.status${st.charAt(0).toUpperCase() + st.slice(1)}`, null, st) : t('adminOrders.filterAll', null, 'All Orders')}
             </button>
           ))}
         </div>
@@ -83,25 +86,25 @@ export const AdminOrdersPage = () => {
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950/80 text-slate-400 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-800">
               <tr>
-                <th className="p-4">Reference</th>
-                <th className="p-4">Customer</th>
-                <th className="p-4">Items Count</th>
-                <th className="p-4">Total Amount</th>
-                <th className="p-4">Pipeline Status</th>
-                <th className="p-4 text-right">Actions</th>
+                <th className="p-4">{t('adminOrders.orderId', null, 'Reference')}</th>
+                <th className="p-4">{t('adminOrders.customer', null, 'Customer')}</th>
+                <th className="p-4">{t('adminOrders.items', null, 'Items Count')}</th>
+                <th className="p-4">{t('adminOrders.total', null, 'Total Amount')}</th>
+                <th className="p-4">{t('adminOrders.status', null, 'Pipeline Status')}</th>
+                <th className="p-4 text-right">{t('adminOrders.actions', null, 'Actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/80">
               {isLoading ? (
                 <tr>
                   <td colSpan="6" className="p-8 text-center text-slate-500">
-                    Loading orders...
+                    {t('common.loading', null, 'Loading orders...')}
                   </td>
                 </tr>
               ) : orders.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="p-8 text-center text-slate-500">
-                    No orders in this status category.
+                    {t('adminDashboard.noOrders', null, 'No orders in this status category.')}
                   </td>
                 </tr>
               ) : (
@@ -115,10 +118,10 @@ export const AdminOrdersPage = () => {
                       <p className="text-[11px] text-slate-500">{order.user?.email}</p>
                     </td>
                     <td className="p-4">
-                      {order.orderItems?.reduce((acc, i) => acc + i.quantity, 0)} items
+                      {order.orderItems?.reduce((acc, i) => acc + i.quantity, 0)} {t('adminOrders.items', null, 'items')}
                     </td>
-                    <td className="p-4 font-bold text-amber-400 font-['Outfit'] text-sm">
-                      ${order.totalPrice.toFixed(2)}
+                    <td className="p-4 font-bold text-amber-400 font-display text-sm">
+                      {formatPrice(order.totalPrice, order.currency)}
                     </td>
                     <td className="p-4">
                       <select
@@ -135,18 +138,18 @@ export const AdminOrdersPage = () => {
                             : 'border-amber-500/40 text-amber-400'
                         }`}
                       >
-                        <option value="pending">pending</option>
-                        <option value="confirmed">confirmed</option>
-                        <option value="shipping">shipping</option>
-                        <option value="completed">completed</option>
-                        <option value="cancelled">cancelled</option>
+                        <option value="pending">{t('userOrders.statusPending', null, 'Pending')}</option>
+                        <option value="confirmed">{t('userOrders.statusConfirmed', null, 'Confirmed')}</option>
+                        <option value="shipping">{t('userOrders.statusShipping', null, 'Shipping')}</option>
+                        <option value="completed">{t('userOrders.statusCompleted', null, 'Completed')}</option>
+                        <option value="cancelled">{t('userOrders.statusCancelled', null, 'Cancelled')}</option>
                       </select>
                     </td>
                     <td className="p-4 text-right">
                       <button
                         onClick={() => openDetails(order)}
                         className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white"
-                        title="View Full Order"
+                        title={t('adminOrders.viewDetails', null, 'View Details')}
                       >
                         <Eye className="w-3.5 h-3.5" />
                       </button>
@@ -163,19 +166,19 @@ export const AdminOrdersPage = () => {
       <Modal
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
-        title={activeOrder ? `Order Details #${activeOrder._id}` : 'Order View'}
+        title={activeOrder ? `${t('adminOrders.orderDetails', { id: activeOrder._id }, `Order Details #${activeOrder._id}`)}` : 'Order View'}
       >
         {activeOrder && (
           <div className="space-y-6 text-xs text-slate-300">
             {/* Customer & Address */}
             <div className="grid grid-cols-2 gap-4 p-4 rounded-2xl bg-slate-950 border border-slate-800">
               <div>
-                <p className="font-bold uppercase text-[10px] text-slate-500 mb-1">Customer</p>
+                <p className="font-bold uppercase text-[10px] text-slate-500 mb-1">{t('adminOrders.customer', null, 'Customer')}</p>
                 <p className="font-bold text-white text-sm">{activeOrder.shippingAddress?.fullName}</p>
                 <p className="text-slate-400">{activeOrder.shippingAddress?.phone}</p>
               </div>
               <div>
-                <p className="font-bold uppercase text-[10px] text-slate-500 mb-1">Shipping To</p>
+                <p className="font-bold uppercase text-[10px] text-slate-500 mb-1">{t('orderSuccess.shippingTo', null, 'Shipping To')}</p>
                 <p>{activeOrder.shippingAddress?.street}</p>
                 <p>
                   {activeOrder.shippingAddress?.city}, {activeOrder.shippingAddress?.state}{' '}
@@ -188,7 +191,7 @@ export const AdminOrdersPage = () => {
             {/* Items */}
             <div className="space-y-2">
               <p className="font-bold uppercase text-[10px] text-slate-400 tracking-wider">
-                Order Items ({activeOrder.orderItems.length})
+                {t('adminOrders.items', null, 'Order Items')} ({activeOrder.orderItems.length})
               </p>
               <div className="space-y-2 max-h-44 overflow-y-auto pr-1 divide-y divide-slate-800">
                 {activeOrder.orderItems.map((item, idx) => (
@@ -201,11 +204,13 @@ export const AdminOrdersPage = () => {
                       />
                       <div className="truncate">
                         <p className="font-semibold text-white truncate">{item.name}</p>
-                        <p className="text-slate-500">Qty: {item.quantity} • ${item.price.toFixed(2)} each</p>
+                        <p className="text-slate-500">
+                          {t('cart.quantity', null, 'Qty')}: {item.quantity} • {formatPrice(item.price, activeOrder.currency)} {t('cart.itemPrice', null, 'each')}
+                        </p>
                       </div>
                     </div>
-                    <span className="font-bold text-white font-['Outfit']">
-                      ${(item.price * item.quantity).toFixed(2)}
+                    <span className="font-bold text-white font-display">
+                      {formatPrice(item.price * item.quantity, activeOrder.currency)}
                     </span>
                   </div>
                 ))}
@@ -216,7 +221,7 @@ export const AdminOrdersPage = () => {
             {activeOrder.statusTimeline?.length > 0 && (
               <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
                 <p className="font-bold uppercase text-[10px] text-slate-400 tracking-wider">
-                  Timeline Log
+                  {t('userOrders.timelineUpdates', null, 'Timeline Updates')}
                 </p>
                 <div className="space-y-1">
                   {activeOrder.statusTimeline.map((step, idx) => (
@@ -234,9 +239,9 @@ export const AdminOrdersPage = () => {
 
             {/* Totals */}
             <div className="pt-2 border-t border-slate-800 flex justify-between items-baseline text-sm">
-              <span className="font-bold text-slate-300">Grand Total</span>
-              <span className="text-lg font-extrabold text-amber-400 font-['Outfit']">
-                ${activeOrder.totalPrice.toFixed(2)}
+              <span className="font-bold text-slate-300">{t('cart.grandTotal', null, 'Grand Total')}</span>
+              <span className="text-lg font-extrabold text-amber-400 font-display">
+                {formatPrice(activeOrder.totalPrice, activeOrder.currency)}
               </span>
             </div>
           </div>
@@ -247,3 +252,4 @@ export const AdminOrdersPage = () => {
 };
 
 export default AdminOrdersPage;
+

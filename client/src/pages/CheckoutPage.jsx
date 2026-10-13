@@ -3,12 +3,16 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck, CreditCard, DollarSign, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
+import { useTranslation } from '../store/localeStore';
+import { useCurrencyStore } from '../store/currencyStore';
 import { orderApi } from '../api';
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
   const { items, clearCart, getTotalPrice } = useCartStore();
   const { user, isAuthenticated } = useAuthStore();
+  const { t } = useTranslation();
+  const { currency, usdToVndRate, formatPrice } = useCurrencyStore();
 
   const [shippingAddress, setShippingAddress] = useState({
     fullName: user?.shippingAddress?.fullName || user?.name || '',
@@ -32,12 +36,12 @@ export const CheckoutPage = () => {
   if (items.length === 0) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center space-y-4">
-        <h2 className="text-2xl font-bold text-white font-['Outfit']">No items in your cart to checkout</h2>
+        <h2 className="text-2xl font-bold text-white font-display">{t('cart.emptyTitle', null, 'No items in your cart to checkout')}</h2>
         <Link
           to="/catalog"
           className="inline-block px-6 py-2.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-sm"
         >
-          Return to Catalog
+          {t('catalog.title', null, 'Return to Catalog')}
         </Link>
       </div>
     );
@@ -52,7 +56,7 @@ export const CheckoutPage = () => {
     setErrorMsg(null);
 
     if (!isAuthenticated) {
-      setErrorMsg('Please sign in or register before completing your order so your package can be tracked.');
+      setErrorMsg(t('auth.loginRequired', null, 'Please sign in or register before completing your order so your package can be tracked.'));
       return;
     }
 
@@ -63,7 +67,7 @@ export const CheckoutPage = () => {
       !shippingAddress.state ||
       !shippingAddress.postalCode
     ) {
-      setErrorMsg('Please complete all required shipping fields');
+      setErrorMsg(t('common.error', null, 'Please complete all required shipping fields'));
       return;
     }
 
@@ -84,6 +88,8 @@ export const CheckoutPage = () => {
         shippingPrice,
         taxPrice,
         totalPrice,
+        currency,
+        exchangeRate: usdToVndRate,
       };
 
       const response = await orderApi.create(orderPayload);
@@ -110,10 +116,10 @@ export const CheckoutPage = () => {
           to="/cart"
           className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white mb-3"
         >
-          <ArrowLeft className="w-3.5 h-3.5" /> Back to Cart
+          <ArrowLeft className="w-3.5 h-3.5" /> {t('checkout.backToCart', null, 'Back to Cart')}
         </Link>
-        <h1 className="text-3xl font-extrabold text-white font-['Outfit']">Collector Checkout</h1>
-        <p className="text-xs text-slate-400 mt-1">Review shipping coordinates and confirm stock allocation</p>
+        <h1 className="text-3xl font-extrabold text-white font-display">{t('checkout.title', null, 'Collector Checkout')}</h1>
+        <p className="text-xs text-slate-400 mt-1">{t('checkout.subtitle', null, 'Review shipping coordinates and confirm stock allocation')}</p>
       </div>
 
       {!isAuthenticated && (
@@ -121,14 +127,14 @@ export const CheckoutPage = () => {
           <div className="flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
             <p className="text-xs sm:text-sm text-amber-200">
-              You are checking out as a guest. Sign in to link this order to your collector profile and access tracking.
+              {t('checkout.guestWarning', null, 'You are checking out as a guest. Sign in to link this order to your collector profile and access tracking.')}
             </p>
           </div>
           <Link
             to="/login?redirect=/checkout"
             className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold shrink-0 transition-all"
           >
-            Sign In Now
+            {t('nav.login', null, 'Sign In Now')}
           </Link>
         </div>
       )}
@@ -145,17 +151,17 @@ export const CheckoutPage = () => {
         <div className="lg:col-span-2 space-y-8">
           {/* 1. Shipping Address */}
           <div className="p-6 rounded-3xl bg-vault-900 border border-slate-800 space-y-4">
-            <h2 className="text-lg font-bold text-white font-['Outfit'] flex items-center gap-2">
+            <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 text-xs flex items-center justify-center font-bold">
                 1
               </span>
-              Shipping Destination
+              {t('checkout.shippingInfo', null, 'Shipping Destination')}
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                  Recipient Full Name *
+                  {t('checkout.fullName', null, 'Recipient Full Name *')}
                 </label>
                 <input
                   type="text"
@@ -169,7 +175,7 @@ export const CheckoutPage = () => {
 
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                  Phone Number
+                  {t('checkout.phone', null, 'Phone Number')}
                 </label>
                 <input
                   type="text"
@@ -183,7 +189,7 @@ export const CheckoutPage = () => {
 
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                  Country
+                  {t('checkout.country', null, 'Country')}
                 </label>
                 <input
                   type="text"
@@ -196,7 +202,7 @@ export const CheckoutPage = () => {
 
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                  Street Address *
+                  {t('checkout.street', null, 'Street Address *')}
                 </label>
                 <input
                   type="text"
@@ -211,7 +217,7 @@ export const CheckoutPage = () => {
 
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                  City *
+                  {t('checkout.city', null, 'City *')}
                 </label>
                 <input
                   type="text"
@@ -226,7 +232,7 @@ export const CheckoutPage = () => {
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                    State *
+                    {t('checkout.state', null, 'State *')}
                   </label>
                   <input
                     type="text"
@@ -239,7 +245,7 @@ export const CheckoutPage = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                    ZIP Code *
+                    {t('checkout.postalCode', null, 'ZIP Code *')}
                   </label>
                   <input
                     type="text"
@@ -256,18 +262,18 @@ export const CheckoutPage = () => {
 
           {/* 2. Payment Method */}
           <div className="p-6 rounded-3xl bg-vault-900 border border-slate-800 space-y-4">
-            <h2 className="text-lg font-bold text-white font-['Outfit'] flex items-center gap-2">
+            <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 text-xs flex items-center justify-center font-bold">
                 2
               </span>
-              Payment Method
+              {t('checkout.paymentMethod', null, 'Payment Instrument')}
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
-                { id: 'Credit Card', name: 'Credit / Debit Card', icon: CreditCard },
-                { id: 'PayPal', name: 'PayPal Express', icon: ShieldCheck },
-                { id: 'Cash on Delivery', name: 'Cash on Delivery (COD)', icon: DollarSign },
+                { id: 'Credit Card', name: t('checkout.creditCard', null, 'Credit / Debit Card'), icon: CreditCard },
+                { id: 'PayPal', name: t('checkout.paypal', null, 'PayPal Express'), icon: ShieldCheck },
+                { id: 'Cash on Delivery', name: t('checkout.cod', null, 'Cash on Delivery (COD)'), icon: DollarSign },
               ].map((method) => (
                 <label
                   key={method.id}
@@ -296,7 +302,7 @@ export const CheckoutPage = () => {
         {/* Right Col: Order Breakdown & Submit */}
         <div className="space-y-6">
           <div className="p-6 rounded-3xl bg-vault-900 border border-slate-800 space-y-4">
-            <h2 className="text-lg font-bold text-white font-['Outfit']">Order Breakdown</h2>
+            <h2 className="text-lg font-bold text-white font-display">{t('checkout.orderSummary', { count: items.length }, 'Order Summary')}</h2>
 
             {/* Micro items list */}
             <div className="max-h-52 overflow-y-auto space-y-2.5 pr-1 divide-y divide-slate-800/80">
@@ -304,10 +310,10 @@ export const CheckoutPage = () => {
                 <div key={item._id} className="pt-2 flex items-center justify-between text-xs gap-3">
                   <div className="truncate">
                     <p className="font-semibold text-white truncate">{item.product?.name}</p>
-                    <p className="text-slate-400">Qty: {item.quantity}</p>
+                    <p className="text-slate-400">{t('cart.quantity', null, 'Qty')}: {item.quantity}</p>
                   </div>
-                  <span className="font-bold text-white font-['Outfit'] shrink-0">
-                    ${((item.price || item.product?.discountPrice || item.product?.price || 0) * item.quantity).toFixed(2)}
+                  <span className="font-bold text-white font-display shrink-0">
+                    {formatPrice((item.price || item.product?.discountPrice || item.product?.price || 0) * item.quantity)}
                   </span>
                 </div>
               ))}
@@ -315,27 +321,27 @@ export const CheckoutPage = () => {
 
             <div className="space-y-2 text-xs text-slate-400 pt-3 border-t border-slate-800">
               <div className="flex justify-between">
-                <span>Items Subtotal</span>
-                <span className="font-bold text-white font-['Outfit'] text-sm">
-                  ${itemsPrice.toFixed(2)}
+                <span>{t('cart.subtotal', null, 'Items Subtotal')}</span>
+                <span className="font-bold text-white font-display text-sm">
+                  {formatPrice(itemsPrice)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>Shipping</span>
+                <span>{t('cart.shipping', null, 'Shipping')}</span>
                 <span className="text-emerald-400 font-bold">
-                  {shippingPrice === 0 ? 'FREE' : `$${shippingPrice.toFixed(2)}`}
+                  {shippingPrice === 0 ? t('cart.freeShipping', null, 'FREE') : formatPrice(shippingPrice)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>State & Local Tax (8%)</span>
-                <span className="font-bold text-white font-['Outfit']">
-                  ${taxPrice.toFixed(2)}
+                <span>{t('cart.tax', null, 'State & Local Tax (8%)')}</span>
+                <span className="font-bold text-white font-display">
+                  {formatPrice(taxPrice)}
                 </span>
               </div>
               <div className="flex justify-between pt-2 border-t border-slate-800 text-sm font-extrabold text-white">
-                <span>Grand Total</span>
-                <span className="text-xl text-amber-400 font-['Outfit']">
-                  ${totalPrice.toFixed(2)}
+                <span>{t('cart.grandTotal', null, 'Grand Total')}</span>
+                <span className="text-xl text-amber-400 font-display">
+                  {formatPrice(totalPrice)}
                 </span>
               </div>
             </div>
@@ -345,7 +351,9 @@ export const CheckoutPage = () => {
               disabled={isSubmitting}
               className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-sm shadow-xl shadow-amber-500/25 transition-all hover:scale-[1.01] disabled:opacity-50"
             >
-              {isSubmitting ? 'Confirming Stock & Placing Order...' : `Authorize & Place Order ($${totalPrice.toFixed(2)})`}
+              {isSubmitting
+                ? t('checkout.authorizing', null, 'Processing Payment & Allocating Stock...')
+                : t('checkout.authorizeBtn', { amount: formatPrice(totalPrice) }, `Authorize & Place Order (${formatPrice(totalPrice)})`)}
             </button>
           </div>
         </div>
@@ -355,3 +363,4 @@ export const CheckoutPage = () => {
 };
 
 export default CheckoutPage;
+

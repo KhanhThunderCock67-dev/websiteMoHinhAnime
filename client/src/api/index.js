@@ -54,3 +54,50 @@ export const chatApi = {
   sendMessage: (messages, stream = false) => api.post('/chat', { messages, stream }),
 };
 
+// Upload API calls
+export const uploadApi = {
+  uploadImage: (file, onUploadProgress) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    return api.post('/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress: (progressEvent) => {
+        if (onUploadProgress && progressEvent.total) {
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onUploadProgress(percent);
+        }
+      },
+    });
+  },
+};
+
+// System Settings & Exchange Rate API calls
+export const settingApi = {
+  get: () => api.get('/settings'),
+  update: (data) => api.put('/settings', data),
+};
+
+// Review & Rating API calls
+export const reviewApi = {
+  getByProduct: (productId, params) => api.get(`/reviews/product/${productId}`, { params }),
+  createOrUpdate: (data) => api.post('/reviews', data),
+  update: (id, data) => api.put(`/reviews/${id}`, data),
+  delete: (id) => api.delete(`/reviews/${id}`),
+  toggleHelpfulVote: (id) => api.post(`/reviews/${id}/vote`),
+  uploadImages: (files) => {
+    const formData = new FormData();
+    Array.from(files).forEach((file) => formData.append('images', file));
+    return api.post('/upload/review-images', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+  // Admin calls
+  getAdminReviews: (params) => api.get('/reviews/admin', { params }),
+  updateStatus: (id, status) => api.patch(`/reviews/admin/${id}/status`, { status }),
+  deleteAdmin: (id) => api.delete(`/reviews/admin/${id}`),
+};
+
+
+

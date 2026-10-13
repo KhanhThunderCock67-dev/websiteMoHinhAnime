@@ -150,7 +150,7 @@ export const ChatWidget = () => {
               ) : null}
             </div>
             <div className="flex flex-col text-left">
-              <span className="text-xs font-bold leading-tight font-['Outfit']">Tư vấn AI</span>
+              <span className="text-xs font-bold leading-tight font-display">Tư vấn AI</span>
               <span className="text-[10px] opacity-80 font-normal leading-none">Hỏi HobbyBot</span>
             </div>
             <Sparkles className="w-4 h-4 text-vault-950 animate-pulse" />

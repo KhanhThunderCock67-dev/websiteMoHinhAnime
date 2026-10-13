@@ -4,10 +4,15 @@ import { ShoppingCart, Star, Check, AlertCircle } from 'lucide-react';
 import Badge from './Badge';
 import { useCartStore } from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
+import { useCurrency } from '../store/currencyStore';
+import { useTranslation } from '../store/localeStore';
 
 export const ProductCard = ({ product }) => {
   const { addToCart } = useCartStore();
   const { isAuthenticated } = useAuthStore();
+  const { formatPrice } = useCurrency();
+  const { t } = useTranslation();
+
   const [isAdding, setIsAdding] = useState(false);
   const [addedSuccess, setAddedSuccess] = useState(false);
 
@@ -64,7 +69,7 @@ export const ProductCard = ({ product }) => {
           <div className="flex flex-col gap-1.5 items-start">
             {product.isPreOrder && (
               <Badge variant="purple" className="shadow-lg backdrop-blur-md">
-                Pre-Order
+                {t('product.preOrder', {}, 'Pre-Order')}
               </Badge>
             )}
             {hasDiscount && (
@@ -79,18 +84,18 @@ export const ProductCard = ({ product }) => {
             {product.attributes?.faction && (
               <Badge
                 variant={getFactionVariant(product.attributes.faction)}
-                className="backdrop-blur-md"
+                className="shadow-lg"
               >
                 {product.attributes.faction}
               </Badge>
             )}
-            {product.attributes?.scale && !product.attributes?.faction && (
-              <Badge variant="anime" className="backdrop-blur-md">
+            {product.attributes?.scale && (
+              <Badge variant="pink" className="shadow-lg">
                 {product.attributes.scale}
               </Badge>
             )}
-            {product.attributes?.complexity && !product.attributes?.scale && !product.attributes?.faction && (
-              <Badge variant="cyan" className="backdrop-blur-md">
+            {product.attributes?.complexity && (
+              <Badge variant="teal" className="shadow-lg">
                 {product.attributes.complexity} Strategy
               </Badge>
             )}
@@ -101,7 +106,7 @@ export const ProductCard = ({ product }) => {
         {isOutOfStock && (
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center">
             <span className="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold uppercase tracking-wider border border-slate-700">
-              Sold Out
+              {t('product.soldOut', {}, 'Sold Out')}
             </span>
           </div>
         )}
@@ -123,10 +128,38 @@ export const ProductCard = ({ product }) => {
           {/* Title */}
           <Link
             to={`/product/${product.slug || product._id}`}
-            className="block text-sm sm:text-base font-semibold text-slate-100 hover:text-amber-400 line-clamp-2 transition-colors mb-2 leading-snug"
+            className="block text-sm sm:text-base font-semibold text-slate-100 hover:text-amber-400 line-clamp-2 transition-colors mb-1.5 leading-snug"
           >
             {product.name}
           </Link>
+
+          {/* Rating & Review Count */}
+          <div className="flex items-center gap-1.5 text-xs mb-2">
+            {product.numReviews > 0 ? (
+              <>
+                <div className="flex items-center gap-1 text-amber-400">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+                  <span className="font-bold text-slate-200 text-xs">
+                    {(product.rating || 0).toFixed(1)}/5
+                  </span>
+                </div>
+                <span className="text-slate-600 text-[10px]">•</span>
+                <span className="text-slate-400 text-[11px]">
+                  ({t(product.numReviews === 1 ? 'reviews.reviewCountSingle' : 'reviews.reviewsCount', { count: product.numReviews }, `${product.numReviews} Reviews`)})
+                </span>
+              </>
+            ) : (
+              <div className="flex items-center gap-1.5 text-slate-500 text-[11px]">
+                <Star className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                <span className="text-slate-400">
+                  {t('reviews.ratingLabel', null, 'Đánh giá')}:
+                </span>
+                <span className="font-medium text-slate-400">
+                  {t('reviews.noReviewsWord', null, 'Không')}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Pricing, Stock status, & CTA Button */}
@@ -134,12 +167,12 @@ export const ProductCard = ({ product }) => {
           <div className="flex items-center justify-between mb-3">
             <div>
               <div className="flex items-baseline gap-2">
-                <span className="text-lg sm:text-xl font-bold font-['Outfit'] text-white">
-                  ${price.toFixed(2)}
+                <span className="text-lg sm:text-xl font-bold font-display text-white">
+                  {formatPrice(price)}
                 </span>
                 {hasDiscount && (
                   <span className="text-xs text-slate-500 line-through">
-                    ${product.price.toFixed(2)}
+                    {formatPrice(product.price)}
                   </span>
                 )}
               </div>
@@ -147,10 +180,12 @@ export const ProductCard = ({ product }) => {
               {/* Stock micro-indicator */}
               {isLowStock ? (
                 <span className="flex items-center gap-1 text-[11px] text-amber-400 font-medium">
-                  <AlertCircle className="w-3 h-3" /> Only {product.stockCount} left
+                  <AlertCircle className="w-3 h-3" /> {t('product.unitsInStock', { count: product.stockCount }, `Only ${product.stockCount} left`)}
                 </span>
               ) : !isOutOfStock ? (
-                <span className="text-[11px] text-emerald-400 font-medium">In Stock</span>
+                <span className="text-[11px] text-emerald-400 font-medium">
+                  {t('product.inStock', {}, 'In Stock')}
+                </span>
               ) : null}
             </div>
 
@@ -175,14 +210,15 @@ export const ProductCard = ({ product }) => {
           >
             {addedSuccess ? (
               <>
-                <Check className="w-4 h-4 text-emerald-400" /> Added to Cart
+                <Check className="w-4 h-4 text-emerald-400" />
+                <span>{t('product.adding', {}, 'Added to Cart')}</span>
               </>
             ) : isOutOfStock ? (
-              'Out of Stock'
+              t('product.soldOut', {}, 'Out of Stock')
             ) : (
               <>
                 <ShoppingCart className="w-4 h-4" />
-                {product.isPreOrder ? 'Pre-Order Now' : 'Add to Cart'}
+                <span>{product.isPreOrder ? t('product.preOrder', {}, 'Pre-Order Now') : t('product.addToCart', {}, 'Add to Cart')}</span>
               </>
             )}
           </button>

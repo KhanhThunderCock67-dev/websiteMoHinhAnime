@@ -8,12 +8,18 @@ import {
   Store,
   LogOut,
   Shield,
-  Sparkles,
+  Package,
+  Settings,
+  Star,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import { useTranslation } from '../store/localeStore';
+import LanguageSelector from '../components/LanguageSelector';
+import CurrencySelector from '../components/CurrencySelector';
 
 export const AdminLayout = () => {
   const { user, logout } = useAuthStore();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -22,10 +28,12 @@ export const AdminLayout = () => {
   };
 
   const navItems = [
-    { name: 'Dashboard', path: '/admin', icon: LayoutDashboard, exact: true },
-    { name: 'Products & Stock', path: '/admin/products', icon: Boxes },
-    { name: 'Orders Pipeline', path: '/admin/orders', icon: ShoppingBag },
-    { name: 'Categories', path: '/admin/categories', icon: FolderTree },
+    { name: t('admin.navDashboard', {}, 'Dashboard'), path: '/admin', icon: LayoutDashboard, exact: true },
+    { name: t('admin.navProducts', {}, 'Products & Stock'), path: '/admin/products', icon: Boxes },
+    { name: t('admin.navOrders', {}, 'Orders Pipeline'), path: '/admin/orders', icon: ShoppingBag },
+    { name: t('admin.navCategories', {}, 'Categories'), path: '/admin/categories', icon: FolderTree },
+    { name: t('adminReviews.title', {}, 'Review Management'), path: '/admin/reviews', icon: Star },
+    { name: t('admin.navSettings', {}, 'System Settings'), path: '/admin/settings', icon: Settings },
   ];
 
   return (
@@ -36,14 +44,14 @@ export const AdminLayout = () => {
         <div className="p-6 border-b border-slate-800 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-slate-950 font-bold">
-              <Sparkles className="w-4 h-4" />
+              <Package className="w-4 h-4" />
             </div>
             <div>
-              <span className="font-bold text-white font-['Outfit'] tracking-wider">
+              <span className="font-bold text-white font-display tracking-wider">
                 HOBBY<span className="text-amber-400">CMS</span>
               </span>
               <span className="block text-[10px] text-slate-500 font-semibold uppercase">
-                Admin Portal
+                {t('admin.portal', {}, 'Admin Portal')}
               </span>
             </div>
           </Link>
@@ -75,7 +83,7 @@ export const AdminLayout = () => {
               className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
             >
               <Store className="w-4 h-4 text-emerald-400" />
-              Customer Storefront
+              {t('admin.customerStorefront', {}, 'Customer Storefront')}
             </Link>
           </div>
         </nav>
@@ -103,17 +111,21 @@ export const AdminLayout = () => {
 
       {/* Main Admin Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        <header className="h-16 px-6 border-b border-slate-800 flex items-center justify-between bg-vault-950/80 backdrop-blur-sm sticky top-0 z-30">
-          <h2 className="text-base font-bold text-white font-['Outfit']">Management Console</h2>
+        <header className="h-16 px-6 border-b border-slate-800 flex items-center justify-between bg-vault-950/80 backdrop-blur-sm sticky top-0 z-30 gap-4">
+          <h2 className="text-base font-bold text-white font-display truncate">
+            {t('admin.portal', {}, 'Management Console')}
+          </h2>
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            <LanguageSelector />
+            <CurrencySelector />
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-              Live Database
+              Live Sync
             </span>
           </div>
         </header>
 
-        <div className="p-6 md:p-8 flex-1">
+        <div className="flex-1 p-6 lg:p-8">
           <Outlet />
         </div>
       </main>

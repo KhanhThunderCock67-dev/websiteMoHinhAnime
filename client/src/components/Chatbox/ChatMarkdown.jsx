@@ -102,7 +102,7 @@ export const ChatMarkdown = ({ content = '' }) => {
         return (
           <span
             key={index}
-            className="inline-flex items-center gap-0.5 font-bold font-['Outfit'] text-amber-400 bg-amber-400/10 px-1.5 py-0.2 rounded border border-amber-400/20 text-xs sm:text-sm mx-0.5"
+            className="inline-flex items-center gap-0.5 font-bold font-display text-amber-400 bg-amber-400/10 px-1.5 py-0.2 rounded border border-amber-400/20 text-xs sm:text-sm mx-0.5"
           >
             <Tag className="w-3 h-3" />
             ${priceMatch[1]}
@@ -128,7 +128,7 @@ export const ChatMarkdown = ({ content = '' }) => {
     if (trimmed.startsWith('### ')) {
       flushList();
       elements.push(
-        <h4 key={`h4-${lineIdx}`} className="text-sm sm:text-base font-bold text-amber-400 mt-2.5 mb-1 font-['Outfit']">
+        <h4 key={`h4-${lineIdx}`} className="text-sm sm:text-base font-bold text-amber-400 mt-2.5 mb-1 font-display">
           {parseInline(trimmed.slice(4))}
         </h4>
       );
@@ -137,7 +137,7 @@ export const ChatMarkdown = ({ content = '' }) => {
     if (trimmed.startsWith('## ')) {
       flushList();
       elements.push(
-        <h3 key={`h3-${lineIdx}`} className="text-base sm:text-lg font-bold text-white mt-3 mb-1 font-['Outfit']">
+        <h3 key={`h3-${lineIdx}`} className="text-base sm:text-lg font-bold text-white mt-3 mb-1 font-display">
           {parseInline(trimmed.slice(3))}
         </h3>
       );
@@ -146,7 +146,7 @@ export const ChatMarkdown = ({ content = '' }) => {
     if (trimmed.startsWith('# ')) {
       flushList();
       elements.push(
-        <h2 key={`h2-${lineIdx}`} className="text-lg sm:text-xl font-extrabold text-amber-400 mt-3 mb-1.5 font-['Outfit']">
+        <h2 key={`h2-${lineIdx}`} className="text-lg sm:text-xl font-extrabold text-amber-400 mt-3 mb-1.5 font-display">
           {parseInline(trimmed.slice(2))}
         </h2>
       );

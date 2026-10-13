@@ -12,6 +12,7 @@ const initialFilters = {
   maxPrice: '',
   inStock: false,
   isPreOrder: '',
+  minRating: '',
   keyword: '',
   sort: 'newest',
   page: 1,

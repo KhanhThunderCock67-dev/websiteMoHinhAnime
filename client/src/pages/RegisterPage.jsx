@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Sparkles, User, Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
+import { Package, User, Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
+import { useTranslation } from '../store/localeStore';
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
   const { register, isLoading, error } = useAuthStore();
   const { syncWithBackend } = useCartStore();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -26,12 +28,12 @@ export const RegisterPage = () => {
     setLocalError(null);
 
     if (formData.password !== formData.confirmPassword) {
-      setLocalError('Passwords do not match');
+      setLocalError(t('auth.passwordMismatch', null, 'Passwords do not match'));
       return;
     }
 
     if (formData.password.length < 6) {
-      setLocalError('Password must be at least 6 characters long');
+      setLocalError(t('auth.passwordTooShort', null, 'Password must be at least 6 characters long'));
       return;
     }
 
@@ -52,13 +54,13 @@ export const RegisterPage = () => {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
           <div className="inline-flex w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 items-center justify-center text-amber-400 mb-2">
-            <Sparkles className="w-6 h-6" />
+            <Package className="w-6 h-6" />
           </div>
-          <h1 className="text-3xl font-extrabold text-white font-['Outfit']">
-            Create Collector Profile
+          <h1 className="text-3xl font-extrabold text-white font-display">
+            {t('auth.registerTitle', null, 'Create Collector Profile')}
           </h1>
           <p className="text-xs text-slate-400">
-            Join thousands of collectors securing rare scale figures and miniatures
+            {t('auth.registerSubtitle', null, 'Join thousands of collectors securing rare scale figures and miniatures')}
           </p>
         </div>
 
@@ -73,7 +75,7 @@ export const RegisterPage = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                Full Name
+                {t('auth.name', null, 'Full Name')}
               </label>
               <div className="relative">
                 <input
@@ -91,7 +93,7 @@ export const RegisterPage = () => {
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                Email Address
+                {t('auth.email', null, 'Email Address')}
               </label>
               <div className="relative">
                 <input
@@ -109,7 +111,7 @@ export const RegisterPage = () => {
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                Password
+                {t('auth.password', null, 'Password')}
               </label>
               <div className="relative">
                 <input
@@ -127,7 +129,7 @@ export const RegisterPage = () => {
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                Confirm Password
+                {t('auth.confirmPassword', null, 'Confirm Password')}
               </label>
               <div className="relative">
                 <input
@@ -148,16 +150,16 @@ export const RegisterPage = () => {
               disabled={isLoading}
               className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-sm shadow-xl shadow-amber-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] disabled:opacity-50"
             >
-              {isLoading ? 'Creating Profile...' : 'Complete Registration'}
+              {isLoading ? t('auth.registering', null, 'Creating Profile...') : t('auth.registerBtn', null, 'Complete Registration')}
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
           <div className="text-center pt-2">
             <p className="text-xs text-slate-400">
-              Already have an account?{' '}
+              {t('auth.haveAccount', null, 'Already have an account?')}{' '}
               <Link to="/login" className="text-amber-400 font-bold hover:underline">
-                Sign In
+                {t('auth.signInHere', null, 'Sign In')}
               </Link>
             </p>
           </div>
@@ -168,3 +170,4 @@ export const RegisterPage = () => {
 };
 
 export default RegisterPage;
+

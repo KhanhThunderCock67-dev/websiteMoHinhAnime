@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Clock, Truck, CheckCircle, XCircle, ArrowRight } from 'lucide-react';
+import { Package } from 'lucide-react';
 import Badge from '../components/Badge';
 import { orderApi } from '../api';
+import { useTranslation, useLocaleStore } from '../store/localeStore';
+import { useCurrencyStore } from '../store/currencyStore';
 
 export const UserOrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
+  const { language } = useLocaleStore();
+  const { formatPrice } = useCurrencyStore();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -25,15 +30,15 @@ export const UserOrdersPage = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'completed':
-        return <Badge variant="success">Completed / Delivered</Badge>;
+        return <Badge variant="success">{t('userOrders.statusCompleted', null, 'Completed / Delivered')}</Badge>;
       case 'shipping':
-        return <Badge variant="cyan">In Transit</Badge>;
+        return <Badge variant="cyan">{t('userOrders.statusShipping', null, 'In Transit')}</Badge>;
       case 'confirmed':
-        return <Badge variant="amber">Order Confirmed</Badge>;
+        return <Badge variant="amber">{t('userOrders.statusConfirmed', null, 'Order Confirmed')}</Badge>;
       case 'cancelled':
-        return <Badge variant="danger">Cancelled</Badge>;
+        return <Badge variant="danger">{t('userOrders.statusCancelled', null, 'Cancelled')}</Badge>;
       default:
-        return <Badge variant="warning">Pending Confirmation</Badge>;
+        return <Badge variant="warning">{t('userOrders.statusPending', null, 'Pending Confirmation')}</Badge>;
     }
   };
 
@@ -48,8 +53,8 @@ export const UserOrdersPage = () => {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       <div>
-        <h1 className="text-3xl font-extrabold text-white font-['Outfit']">My Collector Orders</h1>
-        <p className="text-xs text-slate-400 mt-1">Track shipments and status timeline history</p>
+        <h1 className="text-3xl font-extrabold text-white font-display">{t('userOrders.title', null, 'My Collector Orders')}</h1>
+        <p className="text-xs text-slate-400 mt-1">{t('userOrders.subtitle', null, 'Track shipments and status timeline history')}</p>
       </div>
 
       {orders.length === 0 ? (
@@ -57,15 +62,15 @@ export const UserOrdersPage = () => {
           <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center text-slate-500 mx-auto">
             <Package className="w-8 h-8" />
           </div>
-          <h3 className="text-lg font-bold text-white">No past orders found</h3>
+          <h3 className="text-lg font-bold text-white">{t('userOrders.emptyTitle', null, 'No past orders found')}</h3>
           <p className="text-xs text-slate-400 max-w-sm mx-auto">
-            You haven't made any acquisitions yet. Start your collection today!
+            {t('userOrders.emptyDesc', null, "You haven't made any acquisitions yet. Start your collection today!")}
           </p>
           <Link
             to="/catalog"
             className="inline-block px-5 py-2.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold shadow-md hover:bg-amber-400 transition-all"
           >
-            Explore Catalog
+            {t('userOrders.exploreCatalog', null, 'Explore Catalog')}
           </Link>
         </div>
       ) : (
@@ -77,13 +82,13 @@ export const UserOrdersPage = () => {
             >
               <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800">
                 <div>
-                  <span className="text-xs text-slate-400">Order Reference</span>
+                  <span className="text-xs text-slate-400">{t('userOrders.orderRef', null, 'Order Reference')}</span>
                   <p className="font-mono text-sm font-bold text-white">#{order._id}</p>
                 </div>
                 <div>
-                  <span className="text-xs text-slate-400">Date Placed</span>
+                  <span className="text-xs text-slate-400">{t('userOrders.datePlaced', null, 'Date Placed')}</span>
                   <p className="text-xs text-slate-200">
-                    {new Date(order.createdAt).toLocaleDateString('en-US', {
+                    {new Date(order.createdAt).toLocaleDateString(language === 'vi' ? 'vi-VN' : 'en-US', {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric',
@@ -91,9 +96,9 @@ export const UserOrdersPage = () => {
                   </p>
                 </div>
                 <div>
-                  <span className="text-xs text-slate-400">Total Price</span>
-                  <p className="text-sm font-extrabold text-amber-400 font-['Outfit']">
-                    ${order.totalPrice.toFixed(2)}
+                  <span className="text-xs text-slate-400">{t('userOrders.totalAmount', null, 'Total Price')}</span>
+                  <p className="text-sm font-extrabold text-amber-400 font-display">
+                    {formatPrice(order.totalPrice, order.currency)}
                   </p>
                 </div>
                 <div>{getStatusBadge(order.orderStatus)}</div>
@@ -115,12 +120,12 @@ export const UserOrdersPage = () => {
                       <div>
                         <p className="font-semibold text-white truncate max-w-sm">{item.name}</p>
                         <p className="text-slate-400">
-                          Qty: {item.quantity} • ${item.price.toFixed(2)} each
+                          {t('cart.quantity', null, 'Qty')}: {item.quantity} • {formatPrice(item.price, order.currency)} {t('cart.itemPrice', null, 'each')}
                         </p>
                       </div>
                     </div>
-                    <span className="font-bold text-white font-['Outfit']">
-                      ${(item.price * item.quantity).toFixed(2)}
+                    <span className="font-bold text-white font-display">
+                      {formatPrice(item.price * item.quantity, order.currency)}
                     </span>
                   </div>
                 ))}
@@ -130,7 +135,7 @@ export const UserOrdersPage = () => {
               {order.statusTimeline?.length > 0 && (
                 <div className="pt-3 border-t border-slate-800/80">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                    Timeline Updates
+                    {t('userOrders.timelineUpdates', null, 'Timeline Updates')}
                   </span>
                   <div className="space-y-1.5">
                     {order.statusTimeline.map((step, sIdx) => (
@@ -160,3 +165,4 @@ export const UserOrdersPage = () => {
 };
 
 export default UserOrdersPage;
+

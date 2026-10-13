@@ -8,7 +8,7 @@ const orderItemSchema = new mongoose.Schema(
       required: true,
     },
     name: { type: String, required: true },
-    image: { type: String, required: true },
+    image: { type: String, default: '' },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true, min: 1 },
     sku: { type: String, default: '' },
@@ -83,7 +83,17 @@ const orderSchema = new mongoose.Schema(
       required: true,
       default: 0.0,
     },
+    currency: {
+      type: String,
+      enum: ['USD', 'VND'],
+      default: 'USD',
+    },
+    exchangeRate: {
+      type: Number,
+      default: 1,
+    },
     orderStatus: {
+
       type: String,
       enum: ['pending', 'confirmed', 'shipping', 'completed', 'cancelled'],
       default: 'pending',

@@ -18,14 +18,20 @@ import {
 } from 'lucide-react';
 import Badge from '../components/Badge';
 import ProductCard from '../components/ProductCard';
+import ReviewSection from '../components/Reviews/ReviewSection';
 import { productApi } from '../api';
 import { useCartStore } from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
+import { useCurrency } from '../store/currencyStore';
+import { useTranslation } from '../store/localeStore';
 
 export const ProductDetailPage = () => {
   const { slug } = useParams();
   const { addToCart } = useCartStore();
   const { isAuthenticated } = useAuthStore();
+  const { formatPrice } = useCurrency();
+  const { t } = useTranslation();
+
 
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -170,7 +176,7 @@ export const ProductDetailPage = () => {
             </div>
 
             {/* Product Title */}
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-['Outfit'] leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-display leading-tight">
               {product.name}
             </h1>
 
@@ -180,25 +186,46 @@ export const ProductDetailPage = () => {
                 SKU: <strong className="text-slate-200">{product.sku}</strong>
               </span>
               <span>•</span>
-              <div className="flex items-center gap-1">
-                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                <span className="font-bold text-slate-200">{product.rating}</span>
-                <span>({product.numReviews} collector reviews)</span>
-              </div>
+              <a
+                href="#customer-reviews"
+                className="flex items-center gap-1.5 hover:text-amber-400 transition-colors group cursor-pointer"
+              >
+                {product.numReviews > 0 ? (
+                  <>
+                    <Star className="w-4 h-4 fill-amber-400 text-amber-400 group-hover:scale-110 transition-transform" />
+                    <span className="font-bold text-slate-200">
+                      {(product.rating || 0).toFixed(1)}
+                    </span>
+                    <span className="text-slate-400 group-hover:text-amber-400">
+                      ({t(product.numReviews === 1 ? 'reviews.reviewCountSingle' : 'reviews.reviewsCount', { count: product.numReviews }, `${product.numReviews} Reviews`)})
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Star className="w-4 h-4 text-slate-500" />
+                    <span className="text-slate-400">
+                      {t('reviews.ratingLabel', null, 'Đánh giá')}:
+                    </span>
+                    <span className="font-semibold text-slate-300 group-hover:text-amber-400">
+                      {t('reviews.noReviewsWord', null, 'Không')}
+                    </span>
+                  </>
+                )}
+              </a>
             </div>
 
             {/* Price & Discount */}
             <div className="p-4 rounded-2xl bg-vault-900 border border-slate-800/80 flex items-baseline gap-4">
-              <span className="text-3xl sm:text-4xl font-extrabold text-white font-['Outfit']">
-                ${price.toFixed(2)}
+              <span className="text-3xl sm:text-4xl font-extrabold text-white font-display">
+                {formatPrice(price)}
               </span>
               {hasDiscount && (
                 <>
                   <span className="text-sm text-slate-500 line-through">
-                    ${product.price.toFixed(2)}
+                    {formatPrice(product.price)}
                   </span>
                   <Badge variant="danger" className="font-bold">
-                    SAVE ${(product.price - product.discountPrice).toFixed(2)}
+                    {t('product.save', { amount: formatPrice(product.price - product.discountPrice) }, `SAVE ${formatPrice(product.price - product.discountPrice)}`)}
                   </Badge>
                 </>
               )}
@@ -209,13 +236,9 @@ export const ProductDetailPage = () => {
               <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center gap-3 text-purple-300">
                 <Calendar className="w-5 h-5 text-purple-400 shrink-0" />
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider">Scheduled Release Date</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wider">{t('product.releaseDate', {}, 'Scheduled Release Date')}</h4>
                   <p className="text-sm font-semibold">
-                    {new Date(product.releaseDate).toLocaleDateString('en-US', {
-                      month: 'long',
-                      year: 'numeric',
-                      day: 'numeric',
-                    })}
+                    {new Date(product.releaseDate).toLocaleDateString()}
                   </p>
                 </div>
               </div>
@@ -225,15 +248,15 @@ export const ProductDetailPage = () => {
             <div className="text-sm">
               {isOutOfStock ? (
                 <div className="flex items-center gap-2 text-rose-400 font-semibold">
-                  <AlertCircle className="w-4 h-4" /> Currently Out of Stock
+                  <AlertCircle className="w-4 h-4" /> {t('product.soldOut', {}, 'Currently Out of Stock')}
                 </div>
               ) : isLowStock ? (
                 <div className="flex items-center gap-2 text-amber-400 font-semibold">
-                  <AlertCircle className="w-4 h-4" /> Low Stock Alert: Only {product.stockCount} units remaining
+                  <AlertCircle className="w-4 h-4" /> {t('product.unitsInStock', { count: product.stockCount }, `Only ${product.stockCount} left`)}
                 </div>
               ) : (
                 <div className="flex items-center gap-2 text-emerald-400 font-semibold">
-                  <Check className="w-4 h-4" /> In Stock & Ready to Ship ({product.stockCount} available)
+                  <Check className="w-4 h-4" /> {t('product.inStock', {}, 'In Stock & Ready to Ship')} ({product.stockCount})
                 </div>
               )}
             </div>
@@ -275,18 +298,19 @@ export const ProductDetailPage = () => {
               >
                 {addSuccess ? (
                   <>
-                    <Check className="w-5 h-5" /> Added to Your Cart
+                    <Check className="w-5 h-5" /> {t('product.adding', {}, 'Added to Cart')}
                   </>
                 ) : isOutOfStock ? (
-                  'Sold Out'
+                  t('product.soldOut', {}, 'Sold Out')
                 ) : (
                   <>
                     <ShoppingBag className="w-5 h-5" />
-                    {product.isPreOrder ? 'Reserve Pre-Order Now' : 'Add to Cart'}
+                    {product.isPreOrder ? t('product.preOrder', {}, 'Reserve Pre-Order Now') : t('product.addToCart', {}, 'Add to Cart')}
                   </>
                 )}
               </button>
             </div>
+
           </div>
 
           {/* Value Props Box */}
@@ -311,7 +335,7 @@ export const ProductDetailPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <div className="p-6 sm:p-8 rounded-3xl bg-vault-900 border border-slate-800 space-y-4">
-            <h3 className="text-xl font-bold text-white font-['Outfit']">Collector Overview</h3>
+            <h3 className="text-xl font-bold text-white font-display">Collector Overview</h3>
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed whitespace-pre-line">
               {product.description}
             </p>
@@ -320,7 +344,7 @@ export const ProductDetailPage = () => {
 
         {/* Technical Attributes Table */}
         <div className="p-6 rounded-3xl bg-vault-900 border border-slate-800 space-y-4">
-          <h3 className="text-base font-bold text-white font-['Outfit'] flex items-center gap-2">
+          <h3 className="text-base font-bold text-white font-display flex items-center gap-2">
             <Layers className="w-4 h-4 text-amber-400" /> Specifications
           </h3>
           <div className="space-y-3 text-xs divide-y divide-slate-800">
@@ -382,10 +406,13 @@ export const ProductDetailPage = () => {
         </div>
       </div>
 
+      {/* Customer Reviews Section */}
+      <ReviewSection productId={product._id} product={product} />
+
       {/* Related Products Carousel */}
       {relatedProducts.length > 0 && (
         <div className="pt-10 border-t border-slate-800 space-y-6">
-          <h2 className="text-2xl font-bold text-white font-['Outfit']">Related Acquisitions</h2>
+          <h2 className="text-2xl font-bold text-white font-display">Related Acquisitions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {relatedProducts.map((rel) => (
               <ProductCard key={rel._id} product={rel} />

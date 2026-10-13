@@ -7,16 +7,17 @@ import {
   Dices,
   Flame,
   Clock,
-  CheckCircle2,
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { productApi } from '../api';
 import { useFilterStore } from '../store/filterStore';
+import { useTranslation } from '../store/localeStore';
 
 export const HomePage = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { setCategory } = useFilterStore();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadFeatured = async () => {
@@ -48,7 +49,7 @@ export const HomePage = () => {
             <span>Curated Hobby Emporium 2026</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight font-['Outfit'] max-w-4xl mx-auto leading-tight">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight font-display max-w-4xl mx-auto leading-tight">
             Forge Your Army. <br />
             <span className="bg-gradient-to-r from-amber-400 via-rose-400 to-cyan-400 bg-clip-text text-transparent">
               Enshrine Your Waifus.
@@ -56,7 +57,7 @@ export const HomePage = () => {
           </h1>
 
           <p className="mt-6 text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            The collector’s haven for authentic Japanese anime scale figures, Citadel Warhammer 40,000 battleforces, and world-class board games.
+            {t('home.heroSubtitle', null, 'The collector’s haven for authentic Japanese anime scale figures, Citadel Warhammer 40,000 battleforces, and world-class board games.')}
           </p>
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
@@ -64,14 +65,14 @@ export const HomePage = () => {
               to="/catalog"
               className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-sm shadow-xl shadow-amber-500/25 flex items-center gap-2 transition-all hover:scale-105"
             >
-              Explore Full Vault
+              {t('home.exploreCatalog', null, 'Explore Full Vault')}
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               to="/catalog?isPreOrder=true"
               className="px-8 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm border border-slate-700/80 hover:border-slate-600 transition-all"
             >
-              Pre-Order Showcase
+              {t('home.preOrderVault', null, 'Pre-Order Showcase')}
             </Link>
           </div>
         </div>
@@ -80,11 +81,11 @@ export const HomePage = () => {
       {/* Category Showcase Cards */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-['Outfit']">
-            Select Your Hobby Discipline
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
+            {t('home.allCategoriesTitle', null, 'Select Your Hobby Discipline')}
           </h2>
           <p className="text-sm text-slate-400 mt-2">
-            Dive directly into our specialized domains with faceted filters
+            {t('home.allCategoriesSubtitle', null, 'Dive directly into our specialized domains with faceted filters')}
           </p>
         </div>
 
@@ -99,15 +100,15 @@ export const HomePage = () => {
               <div className="w-12 h-12 rounded-2xl bg-pink-500/10 border border-pink-500/30 flex items-center justify-center text-pink-400 group-hover:scale-110 transition-transform">
                 <Sparkles className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-bold text-white font-['Outfit'] group-hover:text-pink-400 transition-colors">
-                Anime Scale Figures
+              <h3 className="text-2xl font-bold text-white font-display group-hover:text-pink-400 transition-colors">
+                {t('nav.animeFigures', null, 'Anime Scale Figures')}
               </h3>
               <p className="text-sm text-slate-400 leading-relaxed">
                 1/7 & 1/4 scales, Nendoroids, Pop Up Parade from Alter, Good Smile Company, and Kotobukiya.
               </p>
             </div>
             <div className="mt-8 flex items-center text-xs font-bold text-pink-400 gap-2 uppercase tracking-wider">
-              <span>Enter Figure Vault</span>
+              <span>{t('home.exploreCatalog', null, 'Enter Figure Vault')}</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
             </div>
           </Link>
@@ -122,15 +123,15 @@ export const HomePage = () => {
               <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
                 <ShieldAlert className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-bold text-white font-['Outfit'] group-hover:text-amber-400 transition-colors">
-                Warhammer 40,000
+              <h3 className="text-2xl font-bold text-white font-display group-hover:text-amber-400 transition-colors">
+                {t('nav.warhammer40k', null, 'Warhammer 40,000')}
               </h3>
               <p className="text-sm text-slate-400 leading-relaxed">
                 Imperium, Chaos, and Xenos Combat Patrols, Kill Team boxes, and Citadel miniatures.
               </p>
             </div>
             <div className="mt-8 flex items-center text-xs font-bold text-amber-400 gap-2 uppercase tracking-wider">
-              <span>Enter Grimdark Armory</span>
+              <span>{t('home.exploreCatalog', null, 'Enter Grimdark Armory')}</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
             </div>
           </Link>
@@ -145,15 +146,15 @@ export const HomePage = () => {
               <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
                 <Dices className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-bold text-white font-['Outfit'] group-hover:text-emerald-400 transition-colors">
-                Tabletop & Board Games
+              <h3 className="text-2xl font-bold text-white font-display group-hover:text-emerald-400 transition-colors">
+                {t('nav.boardGames', null, 'Tabletop & Board Games')}
               </h3>
               <p className="text-sm text-slate-400 leading-relaxed">
                 Heavy eurogames, worker placement, and cooperative strategy gems like Scythe, Terraforming Mars, Dune.
               </p>
             </div>
             <div className="mt-8 flex items-center text-xs font-bold text-emerald-400 gap-2 uppercase tracking-wider">
-              <span>Explore Board Games</span>
+              <span>{t('home.exploreCatalog', null, 'Explore Board Games')}</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
             </div>
           </Link>
@@ -166,17 +167,17 @@ export const HomePage = () => {
           <div>
             <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
               <Flame className="w-4 h-4" />
-              <span>Top Pick Collector Pieces</span>
+              <span>{t('home.featuredTitle', null, 'Top Pick Collector Pieces')}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-['Outfit']">
-              Featured Acquisitions
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
+              {t('home.featuredSubtitle', null, 'Featured Acquisitions')}
             </h2>
           </div>
           <Link
             to="/catalog"
             className="text-xs sm:text-sm font-semibold text-slate-400 hover:text-amber-400 flex items-center gap-1.5 transition-colors"
           >
-            View Complete Catalog
+            {t('home.viewAllProducts', null, 'View Complete Catalog')}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -207,7 +208,7 @@ export const HomePage = () => {
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30">
               <Clock className="w-3.5 h-3.5" /> Guaranteed Price Lock
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-['Outfit']">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
               Never Miss A Grail Figure or Limited Release
             </h2>
             <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
@@ -218,7 +219,7 @@ export const HomePage = () => {
                 to="/catalog?isPreOrder=true"
                 className="px-6 py-3 rounded-xl bg-purple-500 hover:bg-purple-400 text-white font-bold text-sm transition-all shadow-lg shadow-purple-500/20"
               >
-                Browse Upcoming Releases
+                {t('home.preOrderVault', null, 'Browse Upcoming Releases')}
               </Link>
             </div>
           </div>
@@ -229,3 +230,4 @@ export const HomePage = () => {
 };
 
 export default HomePage;
+

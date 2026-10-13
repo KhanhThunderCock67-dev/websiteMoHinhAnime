@@ -18,7 +18,10 @@ const createOrder = asyncHandler(async (req, res) => {
     shippingPrice = 0,
     taxPrice = 0,
     totalPrice,
+    currency = 'USD',
+    exchangeRate = 1,
   } = req.body;
+
 
   if (!orderItems || orderItems.length === 0) {
     throw new ApiError(400, 'No order items specified');
@@ -59,7 +62,10 @@ const createOrder = asyncHandler(async (req, res) => {
     shippingPrice,
     taxPrice,
     totalPrice,
+    currency: currency === 'VND' ? 'VND' : 'USD',
+    exchangeRate: Number(exchangeRate) || 1,
     orderStatus: 'pending',
+
     statusTimeline: [
       {
         status: 'pending',

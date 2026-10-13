@@ -23,6 +23,7 @@ const getProducts = asyncHandler(async (req, res) => {
     maxPrice,
     inStock,
     isPreOrder,
+    minRating,
     sort = 'newest',
     page = 1,
     limit = 12,
@@ -104,6 +105,12 @@ const getProducts = asyncHandler(async (req, res) => {
   // 11. Pre-Order status
   if (isPreOrder !== undefined && isPreOrder !== '') {
     query.isPreOrder = isPreOrder === 'true' || isPreOrder === true;
+  }
+
+  // 12. Rating filter (e.g. 4+ stars, 3+ stars, 2+ stars, 1+ star)
+  if (minRating !== undefined && minRating !== '' && !isNaN(Number(minRating))) {
+    query.rating = { $gte: Number(minRating) };
+    query.numReviews = { $gt: 0 };
   }
 
   // Sorting

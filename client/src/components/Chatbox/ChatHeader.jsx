@@ -19,7 +19,7 @@ export const ChatHeader = ({ onReset, onClose, onMinimize, messageCount = 0 }) =
 
         <div>
           <div className="flex items-center gap-1.5">
-            <h3 className="text-sm font-bold text-slate-100 font-['Outfit']">HobbyBot</h3>
+            <h3 className="text-sm font-bold text-slate-100 font-display">HobbyBot</h3>
             <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/20">
               <Sparkles className="w-2.5 h-2.5" /> AI
             </span>

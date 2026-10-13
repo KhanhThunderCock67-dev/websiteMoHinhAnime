@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts
@@ -22,8 +22,20 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminProductsPage from './pages/admin/AdminProductsPage';
 import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
+import AdminReviewsPage from './pages/admin/AdminReviewsPage';
+import AdminSettingsPage from './pages/admin/AdminSettingsPage';
+
+// Global stores
+import { useCurrency } from './store/currencyStore';
 
 export const App = () => {
+  const { fetchSettings } = useCurrency();
+
+  useEffect(() => {
+    // Fetch live system exchange rates and settings on mount
+    fetchSettings();
+  }, [fetchSettings]);
+
   return (
     <Routes>
       {/* Storefront Layout */}
@@ -59,6 +71,8 @@ export const App = () => {
         <Route path="products" element={<AdminProductsPage />} />
         <Route path="orders" element={<AdminOrdersPage />} />
         <Route path="categories" element={<AdminCategoriesPage />} />
+        <Route path="reviews" element={<AdminReviewsPage />} />
+        <Route path="settings" element={<AdminSettingsPage />} />
       </Route>
 
       {/* Fallback */}

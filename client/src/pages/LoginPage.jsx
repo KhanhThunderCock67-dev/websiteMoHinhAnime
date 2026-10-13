@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Sparkles, Shield, User, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react';
+import { Package, Shield, User, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
+import { useTranslation } from '../store/localeStore';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isLoading, error, clearError } = useAuthStore();
   const { syncWithBackend } = useCartStore();
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -41,16 +43,16 @@ export const LoginPage = () => {
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="inline-flex w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 items-center justify-center text-amber-400 mb-2">
-            <Sparkles className="w-6 h-6" />
+            <Package className="w-6 h-6" />
           </div>
-          <h1 className="text-3xl font-extrabold text-white font-['Outfit']">Sign In to Vault</h1>
-          <p className="text-xs text-slate-400">Access your pre-orders, collection, and member perks</p>
+          <h1 className="text-3xl font-extrabold text-white font-display">{t('auth.loginTitle', null, 'Sign In to Vault')}</h1>
+          <p className="text-xs text-slate-400">{t('auth.loginSubtitle', null, 'Access your pre-orders, collection, and member perks')}</p>
         </div>
 
         {/* Demo Fast-Fill Box */}
         <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5">
           <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider block">
-            Instant Demo Account Fill:
+            {t('auth.instantDemo', null, 'Instant Demo Account Fill:')}
           </span>
           <div className="grid grid-cols-2 gap-2">
             <button
@@ -58,14 +60,14 @@ export const LoginPage = () => {
               onClick={() => handleDemoFill('admin@hobbyvault.com', 'Admin@123456')}
               className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-semibold hover:bg-amber-500/25 transition-all"
             >
-              <Shield className="w-3.5 h-3.5" /> Demo Admin
+              <Shield className="w-3.5 h-3.5" /> {t('auth.demoAdmin', null, 'Demo Admin')}
             </button>
             <button
               type="button"
               onClick={() => handleDemoFill('customer@hobbyvault.com', 'Customer@123456')}
               className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 text-xs font-semibold hover:bg-cyan-500/25 transition-all"
             >
-              <User className="w-3.5 h-3.5" /> Demo Customer
+              <User className="w-3.5 h-3.5" /> {t('auth.demoCustomer', null, 'Demo Customer')}
             </button>
           </div>
         </div>
@@ -82,7 +84,7 @@ export const LoginPage = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                Email Address
+                {t('auth.email', null, 'Email Address')}
               </label>
               <div className="relative">
                 <input
@@ -99,7 +101,7 @@ export const LoginPage = () => {
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                Password
+                {t('auth.password', null, 'Password')}
               </label>
               <div className="relative">
                 <input
@@ -119,16 +121,16 @@ export const LoginPage = () => {
               disabled={isLoading}
               className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-sm shadow-xl shadow-amber-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] disabled:opacity-50"
             >
-              {isLoading ? 'Signing In...' : 'Sign In'}
+              {isLoading ? t('auth.loggingIn', null, 'Signing In...') : t('auth.loginBtn', null, 'Sign In')}
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
           <div className="text-center pt-2">
             <p className="text-xs text-slate-400">
-              Don't have an account yet?{' '}
+              {t('auth.noAccount', null, "Don't have an account yet?")}{' '}
               <Link to="/register" className="text-amber-400 font-bold hover:underline">
-                Create Account
+                {t('auth.signUpHere', null, 'Create Account')}
               </Link>
             </p>
           </div>
@@ -139,3 +141,4 @@ export const LoginPage = () => {
 };
 
 export default LoginPage;
+

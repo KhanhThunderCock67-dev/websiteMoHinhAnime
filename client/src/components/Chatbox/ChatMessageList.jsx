@@ -22,7 +22,7 @@ export const ChatMessageList = ({ messages, isLoading }) => {
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 via-rose-500/20 to-cyan-500/20 border border-amber-500/30 flex items-center justify-center mb-3 shadow-xl shadow-amber-500/10">
             <Bot className="w-7 h-7 text-amber-400 animate-pulse" />
           </div>
-          <h4 className="text-base font-bold text-slate-100 font-['Outfit'] mb-1">
+          <h4 className="text-base font-bold text-slate-100 font-display mb-1">
             Xin chào! Tôi là HobbyBot 🤖
           </h4>
           <p className="text-xs text-slate-400 max-w-xs leading-relaxed mb-4">
